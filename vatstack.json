@@ -1,0 +1,2303 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Vatstack API Specification",
+    "description": "A suite of VAT APIs which let you validate VAT numbers with government services, look up VAT rates by ISO country code, calculate price quotes with centralized VAT rules and store transactions with each sale for VAT reporting.",
+    "contact": {
+      "email": "team@vatstack.com"
+    },
+    "version": "1.3.0"
+  },
+  "externalDocs": {
+    "description": "Vatstack API Reference",
+    "url": "https://vatstack.com/docs"
+  },
+  "components": {
+    "schemas": {
+      "batch": {
+        "type": "object",
+        "description": "Batch mass VAT number validations for due dates. Add VAT numbers in bulk or append VAT numbers incrementally to your existing batch process, then start it whenever required.",
+        "properties": {
+          "created": {
+            "type": "string",
+            "description": "ISO date at which the object was created.",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the object.",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Descriptive name of the object."
+          },
+          "queries": {
+            "type": "array",
+            "description": "Array of all queries in the order of your input.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "queries_ignored": {
+            "type": "array",
+            "description": "Array of all queries which are of invalid format. Ignored queries are automatically identified upon your input. Its items will not be validated.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "scheduled": {
+            "type": "string",
+            "description": "ISO date at which the object status was changed to `scheduled`. Defaults to `null` while the status is `pending`.",
+            "format": "date-time"
+          },
+          "succeeded_count": {
+            "type": "integer",
+            "description": "The number of `validations` where `valid` is `true` or `false`. It’s an indicator for how far the batch has progressed.",
+            "format": "int32"
+          },
+          "updated": {
+            "type": "string",
+            "description": "ISO date at which the object was updated.",
+            "format": "date-time"
+          },
+          "validations": {
+            "type": "array",
+            "description": "Array of the first 20 validation objects in the order of `queries`. If an `id` is shown in the object, it was created for the batch and you can retrieve it individually. See [validation object](https://vatstack.com/docs/validations) for reference.",
+            "items": {
+              "$ref": "#/components/schemas/validation"
+            }
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "error": {
+        "type": "object",
+        "description": "Error response from the Vatstack API.",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "For validations, a short string indicating the [error code](https://vatstack.com/docs/validations).",
+            "maxLength": 50
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable message providing more details about the error.",
+            "maxLength": 250
+          }
+        }
+      },
+      "evidence": {
+        "type": "object",
+        "description": "Store pieces of evidence that confirm your customer’s location. Evidence object can be attached to a supply object and it can only be attached to one supply object at a time.",
+        "properties": {
+          "bank_address": {
+            "type": "object",
+            "properties": {
+              "country_code": {
+                "type": "string",
+                "description": "2-letter ISO country code of the bank or payment source.",
+                "maxLength": 2,
+                "minLength": 2
+              },
+              "name": {
+                "type": "string",
+                "description": "Name of the bank or payment source."
+              }
+            }
+          },
+          "billing_address": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string",
+                "description": "City of the customer’s billing address."
+              },
+              "country_code": {
+                "type": "string",
+                "description": "2-letter ISO country code of the customer’s billing address.",
+                "maxLength": 2,
+                "minLength": 2
+              },
+              "line_1": {
+                "type": "string",
+                "description": "Line 1 of the customer’s billing address."
+              },
+              "line_2": {
+                "type": "string",
+                "description": "Line 2 of the customer’s billing address."
+              },
+              "postal_code": {
+                "type": "string",
+                "description": "Postal code of the customer’s billing address."
+              },
+              "state": {
+                "type": "string",
+                "description": "State of the customer’s billing address."
+              }
+            }
+          },
+          "created": {
+            "type": "string",
+            "description": "ISO date at which the object was created.",
+            "format": "date-time"
+          },
+          "ip_address": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": "The same IP address coming from the `ip_address.label` body parameter which will be geolocated automatically."
+              },
+              "provider": {
+                "type": "string",
+                "description": "Provider used to geolocate `ip_address.label`. We use MaxMind® GeoIP2 geolocation technology by default but have a number of fallback providers."
+              },
+              "city": {
+                "type": "string",
+                "description": "City of the geolocated IP address."
+              },
+              "country_code": {
+                "type": "string",
+                "description": "2-letter ISO country code of the geolocated IP address.",
+                "maxLength": 2,
+                "minLength": 2
+              },
+              "state": {
+                "type": "string",
+                "description": "State of the geolocated IP address."
+              }
+            }
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the object.",
+            "format": "uuid"
+          },
+          "required_count": {
+            "type": "integer",
+            "description": "Required pieces of evidence according to your account’s regional settings.",
+            "format": "int32"
+          },
+          "updated": {
+            "type": "string",
+            "description": "ISO date at which the object was updated.",
+            "format": "date-time"
+          }
+        }
+      },
+      "hit": {
+        "type": "object",
+        "description": "Retrieve the number of hits you have used for the running month and the total capacity allocated to your current subscription plan.",
+        "properties": {
+          "supplies": {
+            "type": "object",
+            "properties": {
+              "capacity": {
+                "type": "integer",
+                "description": "Included supplies in the plan you’re subscribed to.",
+                "format": "int32"
+              },
+              "used": {
+                "type": "integer",
+                "description": "Supplies created during the running month. Additional requests beyond `capacity` will be charged according to the plan you’re subscribed to.",
+                "format": "int32"
+              }
+            }
+          },
+          "validations": {
+            "type": "object",
+            "properties": {
+              "capacity": {
+                "type": "integer",
+                "description": "Included validations in the plan you’re subscribed to.",
+                "format": "int32"
+              },
+              "used": {
+                "type": "integer",
+                "description": "Validations created during the running month. Additional requests beyond `capacity` will be charged according to the plan you’re subscribed to.",
+                "format": "int32"
+              }
+            }
+          }
+        }
+      },
+      "quote": {
+        "type": "object",
+        "description": "The quote object combines the best of the [rate object](https://vatstack.com/docs/rates) and [validation object](https://vatstack.com/docs/validations) and takes them a step further. It uses your existing business information to perform the entire VAT-compliant business logic for you. All VAT rules have been centralized so that every response is directly actionable.",
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "amount_total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "category": {
+            "type": "string",
+            "description": "Category of the digital product. Defaults to `null` if no category was specified in the request or if the category cannot be applied for the `country_code`."
+          },
+          "country_code": {
+            "type": "string",
+            "description": "2-letter ISO country code.",
+            "maxLength": 2,
+            "minLength": 2
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Corresponding English name of `country_code`."
+          },
+          "created": {
+            "type": "string",
+            "description": "ISO date at which the object was created.",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the object.",
+            "format": "uuid"
+          },
+          "ip_address": {
+            "type": "string",
+            "description": "The same IP address coming from the `ip_address` body parameter, or the geolocated IP address if none was provided. Value is `null` if `country_code` was provided."
+          },
+          "local_name": {
+            "type": "string",
+            "description": "Localized name of the VAT identification number."
+          },
+          "member_state": {
+            "type": "boolean",
+            "description": "Boolean indicating whether `country_code` is an EU member state."
+          },
+          "updated": {
+            "type": "string",
+            "description": "ISO date at which the object was updated.",
+            "format": "date-time"
+          },
+          "validation": {
+            "type": "object",
+            "$ref": "#/components/schemas/validation"
+          },
+          "vat": {
+            "type": "object",
+            "properties": {
+              "abbreviation": {
+                "type": "string",
+                "description": "Abbreviation of `vat.local_name`."
+              },
+              "amount": {
+                "type": "integer",
+                "description": "VAT amount in cents.",
+                "format": "int32"
+              },
+              "inclusive": {
+                "type": "string",
+                "description": "Specifies if the `amount_total` is inclusive (common for EU consumers) or exclusive of VAT. This affects how the `vat.amount` is calculated. If `false`, you should present `amount` plus `vat.amount` to your customer as the final price to pay.",
+                "default": false
+              },
+              "local_name": {
+                "type": "string",
+                "description": "Localized name of the VAT."
+              },
+              "rate": {
+                "type": "number",
+                "description": "VAT rate applied for the calculation. If member_state is `false`, the value will be `0`.",
+                "format": "double"
+              },
+              "rate_type": {
+                "type": "string",
+                "description": "Automatically determined type of VAT rate based on inputs. Can be `null`, `exempt`, `reduced`, `reverse_charge`, `standard` or `zero`."
+              }
+            }
+          }
+        }
+      },
+      "rate": {
+        "type": "object",
+        "description": "Keep the rates of your application up-to-date with a regular VAT rate lookup. This ensures that your invoice states the correct VAT across EU Member States. We have also started to add countries outside the EU and will keep them updated.",
+        "properties": {
+          "abbreviation": {
+            "type": "string",
+            "description": "Abbreviation of `local_name`."
+          },
+          "categories": {
+            "type": "object",
+            "properties": {
+              "audiobook": {
+                "type": "number",
+                "format": "double"
+              },
+              "broadcasting": {
+                "type": "number",
+                "format": "double"
+              },
+              "ebook": {
+                "type": "number",
+                "format": "double"
+              },
+              "eperiodical": {
+                "type": "number",
+                "format": "double"
+              },
+              "eservice": {
+                "type": "number",
+                "format": "double"
+              },
+              "telecommunication": {
+                "type": "number",
+                "format": "double"
+              }
+            }
+          },
+          "country_code": {
+            "type": "string",
+            "description": "2-letter ISO country code.",
+            "maxLength": 2,
+            "minLength": 2
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Corresponding English name of `country_code`."
+          },
+          "currency": {
+            "type": "string",
+            "description": "3-letter ISO 4217 local currency code.",
+            "maxLength": 3,
+            "minLength": 3
+          },
+          "local_name": {
+            "type": "string",
+            "description": "Localized name of the VAT identification number."
+          },
+          "member_state": {
+            "type": "boolean",
+            "description": "Boolean indicating whether the country is an EU Member State."
+          },
+          "reduced_rates": {
+            "type": "array",
+            "description": "3-letter ISO 4217 local currency code.",
+            "items": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "standard_rate": {
+            "type": "number",
+            "description": "Standard VAT rate in percent.",
+            "format": "double"
+          },
+          "vat_abbreviation": {
+            "type": "string",
+            "description": "Abbreviation of `vat_local_name`."
+          },
+          "vat_local_name": {
+            "type": "string",
+            "description": "Localized name of the VAT."
+          }
+        }
+      },
+      "supply": {
+        "type": "object",
+        "description": "Supplies are transactions of telecommunications, broadcasting and electronic (TBE) services. To document pieces of evidence for the place of supply, you can attach [evidence objects](https://vatstack.com/docs/evidences) to a supply object. Supplies are also used to automatically generate a quarterly tax report with currency conversion at official exchange rates.",
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "amount_refunded": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "amount_total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "country_code": {
+            "type": "string",
+            "description": "2-letter ISO country code of the place of supply that is relevant for the `vat.rate`.",
+            "maxLength": 2,
+            "minLength": 2
+          },
+          "created": {
+            "type": "string",
+            "description": "ISO date at which the object was created.",
+            "format": "date-time"
+          },
+          "currency": {
+            "type": "string",
+            "description": "3-letter ISO 4217 currency code used to charge the `amount`.",
+            "maxLength": 3,
+            "minLength": 3
+          },
+          "description": {
+            "type": "string",
+            "description": "An arbitrary string to describe the supplied item. Often useful for displaying to users."
+          },
+          "evidence": {
+            "type": "object",
+            "description": "Populated evidence object if an ID is attached. You can attach an evidence object with the `evidence` body parameter in the POST request. Defaults to `null`. See [evidence object](https://vatstack.com/docs/evidences) for reference.",
+            "$ref": "#/components/schemas/evidence"
+          },
+          "evidence_status": {
+            "type": "string",
+            "description": "Status of whether the attached evidence object sufficiently proves the place of supply established in `country_code`. Will be either `sufficient` or `insufficient`."
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the object.",
+            "format": "uuid"
+          },
+          "invoice_number": {
+            "type": "string",
+            "description": "A custom string for the invoice number issued to the customer. It’s advisable to follow sequential numbering."
+          },
+          "issued": {
+            "type": "string",
+            "description": "ISO date at which `invoice_number` was issued.",
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string",
+            "description": "A custom string for the name of the customer."
+          },
+          "notes": {
+            "type": "string",
+            "description": "A custom string for additional notes."
+          },
+          "updated": {
+            "type": "string",
+            "description": "ISO date at which the object was updated.",
+            "format": "date-time"
+          },
+          "validation": {
+            "type": "object",
+            "description": "Populated validation object if an ID is attached. You can attach a validation object with the `validation` body parameter in the POST request. Defaults to `null`. See [validation object](https://vatstack.com/docs/validations) for reference.",
+            "$ref": "#/components/schemas/validation"
+          },
+          "vat": {
+            "type": "object",
+            "properties": {
+              "amount": {
+                "type": "integer",
+                "description": "VAT amount in cents.",
+                "format": "int32"
+              },
+              "inclusive": {
+                "type": "string",
+                "description": "Specifies if the `amount_total` is inclusive (common for EU consumers) or exclusive of VAT. This affects how the `vat.amount` is calculated.",
+                "default": false
+              },
+              "rate": {
+                "type": "number",
+                "description": "VAT rate applicable for the place of supply established in `country_code`.",
+                "format": "double"
+              },
+              "rate_type": {
+                "type": "string",
+                "description": "Automatically determined type of VAT rate based on inputs. Can be `null`, `exempt`, `reduced`, `reverse_charge`, `standard` or `zero`."
+              }
+            }
+          }
+        },
+        "required": [
+          "amount",
+          "country_code",
+          "currency",
+          "invoice_number",
+          "issued"
+        ]
+      },
+      "validation": {
+        "type": "object",
+        "description": "Validate your business customer’s VAT number against official government servers in real-time. The API asynchronously validates VAT numbers for you if government services experience downtime.",
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "description": "Boolean indicating whether the company exists and is active. Use `valid` to check whether the business is also VAT-registered.",
+            "default": null
+          },
+          "code": {
+            "type": "string",
+            "description": "In the event of an error, this field will contain the error code."
+          },
+          "company_address": {
+            "type": "string",
+            "description": "Address of the company the VAT number is associated with. Servers of Germany and Spain won’t return a value for privacy reasons and will default to `null`.",
+            "default": null
+          },
+          "company_name": {
+            "type": "string",
+            "description": "Name of the company the VAT number is associated with. Servers of Germany and Spain won’t return a value for privacy reasons and will default to `null`.",
+            "default": null
+          },
+          "company_type": {
+            "type": "string",
+            "description": "Type of the company entity returned by the respective government service (where available).",
+            "default": null
+          },
+          "consultation_number": {
+            "type": "string",
+            "description": "If you save your own VAT number in your dashboard, the reply will contain a unique consultation number. The consultation number enables you to prove to a tax administration of a Member State that you have checked a VAT number at the `requested` date, and obtained a validation result.",
+            "default": null
+          },
+          "country_code": {
+            "type": "string",
+            "description": "2-letter ISO country code. Note that while Greek VAT numbers contain the `EL` country code, our response will return the ISO country code `GR`.",
+            "maxLength": 2,
+            "minLength": 2
+          },
+          "created": {
+            "type": "string",
+            "description": "ISO date at which the object was created.",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the object.",
+            "format": "uuid"
+          },
+          "query": {
+            "type": "string",
+            "description": "Your original query."
+          },
+          "requested": {
+            "type": "string",
+            "description": "ISO date at which the validation request was originally performed. Types `eu_vat` and `gb_vat` do not specify a time.",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of VAT number.",
+            "enum": [
+              "au_gst",
+              "ch_vat",
+              "eu_oss_vat",
+              "eu_vat",
+              "gb_vat",
+              "no_vat",
+              "sg_gst"
+            ]
+          },
+          "updated": {
+            "type": "string",
+            "description": "ISO date at which the object was updated.",
+            "format": "date-time"
+          },
+          "valid": {
+            "type": "boolean",
+            "description": "Boolean indicating whether the vat_number is registered for VAT. If government services are down, the value will be `null` and re-checked automatically for you.",
+            "default": null
+          },
+          "valid_format": {
+            "type": "boolean",
+            "description": "Boolean indicating whether the VAT number contained in `query` is in a valid format."
+          },
+          "vat_number": {
+            "type": "string",
+            "description": "VAT number extracted from your query without the country code."
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "publicKey": {
+        "type": "apiKey",
+        "name": "X-API-KEY",
+        "in": "header"
+      },
+      "secretKey": {
+        "type": "apiKey",
+        "name": "X-API-KEY",
+        "in": "header"
+      }
+    }
+  },
+  "paths": {
+    "/batches": {
+      "post": {
+        "operationId": "createBatch",
+        "summary": "Creates a batch object.",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Descriptive name of the batch object. Give it any name you like to serve for your reference."
+                  },
+                  "queries": {
+                    "type": "array",
+                    "description": "Array of VAT numbers to be queried. Should be an array of strings.",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Batch object successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/batch"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getAllBatches",
+        "summary": "Retrieves all batch objects in order of creation, with the latest appearing highest.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Integer for the current page.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Show only objects with the given `status`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Batch objects successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "has_more": {
+                      "description": "True if this list has another page of items after this one that can be fetched.",
+                      "type": "boolean"
+                    },
+                    "batches_count": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "batches": {
+                      "items": {
+                        "$ref": "#/components/schemas/batch"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "has_more",
+                    "batches_count",
+                    "batches"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      }
+    },
+    "/batches/{id}": {
+      "get": {
+        "operationId": "getBatchById",
+        "summary": "Retrieves a batch object by the {id} path parameter.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Batch object successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/batch"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateBatchById",
+        "summary": "Updates a batch object by the {id} path parameter.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "type": "string",
+                    "description": "Either `append` to append an array of queries to the existing array of queries, or `replace` to empty the existing array of queries prior to adding. Defaults to `append`.",
+                    "enum": [
+                      "append",
+                      "replace"
+                    ]
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Descriptive name of the batch object. Give it any name you like to serve for your reference."
+                  },
+                  "queries": {
+                    "type": "array",
+                    "description": "Array of VAT numbers to be added while considering the `mode`.",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "Set it to `scheduled` once you want to schedule the validation process with the queries provided. It’s possible to add queries and change the status in one go.",
+                    "enum": [
+                      "scheduled"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Batch object successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/batch"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteBatchById",
+        "summary": "Deletes a batch object by the {id} path parameter.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Batch object successfully deleted."
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      }
+    },
+    "/evidences": {
+      "post": {
+        "operationId": "createEvidence",
+        "summary": "Creates an evidence object.",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bank_address": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Name of the bank or payment source used by the customer. This information is usually provided by your payments provider."
+                      },
+                      "country_code": {
+                        "type": "string",
+                        "description": "2-letter ISO country code of the bank or payment source. This information is usually provided by your payments provider."
+                      }
+                    }
+                  },
+                  "billing_address": {
+                    "type": "object",
+                    "properties": {
+                      "city": {
+                        "type": "string",
+                        "description": "City of the customer’s billing address."
+                      },
+                      "country_code": {
+                        "type": "string",
+                        "description": "2-letter ISO country code of the customer’s billing address."
+                      },
+                      "line_1": {
+                        "type": "string",
+                        "description": "Line 1 of the customer’s billing address."
+                      },
+                      "line_2": {
+                        "type": "string",
+                        "description": "Line 2 of the customer’s billing address."
+                      },
+                      "postal_code": {
+                        "type": "string",
+                        "description": "Postal code of the customer’s billing address."
+                      },
+                      "state": {
+                        "type": "string",
+                        "description": "State of the customer’s billing address."
+                      }
+                    }
+                  },
+                  "ip_address": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string",
+                        "description": "IP address of the customer at the time of supply. We will automatically geolocate this IP address and hydrate the other fields."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Evidence object successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/evidence"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getAllEvidences",
+        "summary": "Retrieves all evidence objects in order of creation, with the latest appearing highest.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Integer for the current page.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Evidence objects successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "has_more": {
+                      "description": "True if this list has another page of items after this one that can be fetched.",
+                      "type": "boolean"
+                    },
+                    "evidences_count": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "evidences": {
+                      "items": {
+                        "$ref": "#/components/schemas/evidence"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "has_more",
+                    "evidences_count",
+                    "evidences"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      }
+    },
+    "/evidences/{id}": {
+      "get": {
+        "operationId": "getEvidenceById",
+        "summary": "Retrieves an evidence object by the {id} path parameter.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Evidence object successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/evidence"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateEvidenceById",
+        "summary": "Updates an evidence object by the {id} path parameter.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bank_address": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Name of the bank or payment source used by the customer. This information is usually provided by your payments provider."
+                      },
+                      "country_code": {
+                        "type": "string",
+                        "description": "2-letter ISO country code of the bank or payment source. This information is usually provided by your payments provider."
+                      }
+                    }
+                  },
+                  "billing_address": {
+                    "type": "object",
+                    "properties": {
+                      "city": {
+                        "type": "string",
+                        "description": "City of the customer’s billing address."
+                      },
+                      "country_code": {
+                        "type": "string",
+                        "description": "2-letter ISO country code of the customer’s billing address."
+                      },
+                      "line_1": {
+                        "type": "string",
+                        "description": "Line 1 of the customer’s billing address."
+                      },
+                      "line_2": {
+                        "type": "string",
+                        "description": "Line 2 of the customer’s billing address."
+                      },
+                      "postal_code": {
+                        "type": "string",
+                        "description": "Postal code of the customer’s billing address."
+                      },
+                      "state": {
+                        "type": "string",
+                        "description": "State of the customer’s billing address."
+                      }
+                    }
+                  },
+                  "ip_address": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string",
+                        "description": "IP address of the customer at the time of supply. We will automatically geolocate this IP address and hydrate the other fields."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Evidence object successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/evidence"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      }
+    },
+    "/hits": {
+      "get": {
+        "operationId": "getAllHits",
+        "summary": "This endpoint can be useful if you want to perform a quick check against your hits count before initiating an API request.",
+        "responses": {
+          "200": {
+            "description": "Hits successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/hit"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "publicKey": [],
+            "secretKey": []
+          }
+        ]
+      }
+    },
+    "/quotes": {
+      "post": {
+        "operationId": "createQuote",
+        "summary": "Creates a quote object.",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "integer",
+                    "description": "Amount in **cents** (e.g. 100.50 must be expressed as 10050). This common common workaround prevents unexpected rounding issues."
+                  },
+                  "country_code": {
+                    "type": "string",
+                    "description": "2-letter ISO country code. If provided, the `ip_address` parameter will be ignored."
+                  },
+                  "category": {
+                    "type": "string",
+                    "description": "Digital products category used for calculation. Supports `audiobook`, `broadcasting`, `ebook`, `eperiodical`, `eservice` and `telecommunication`."
+                  },
+                  "ip_address": {
+                    "type": "string",
+                    "description": "IP address to geolocate the VAT rate for. If neither IP address nor `country_code` is provided, it will be automatically determined from the request."
+                  },
+                  "validation": {
+                    "type": "string",
+                    "description": "Unique identifier of a [validation object](https://vatstack.com/docs/validations). This is useful if you let your customer enter a VAT number beforehand. Its valid value can affect `vat.amount`, `vat.rate` and `amount_total` when zero-rating.",
+                    "format": "uuid"
+                  },
+                  "vat": {
+                    "type": "object",
+                    "properties": {
+                      "inclusive": {
+                        "type": "boolean",
+                        "description": "Boolean for whether the resulting VAT amount should be calculated inclusive or exclusive of VAT. Defaults to `false`. All other `vat` fields will be hydrated for you."
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "amount"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Quote object successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/quote"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "publicKey": [],
+            "secretKey": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getAllQuotes",
+        "summary": "Retrieves all quote objects in order of creation, with the most recent appearing highest.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Integer for the current page.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quote objects successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "has_more": {
+                      "description": "True if this list has another page of items after this one that can be fetched.",
+                      "type": "boolean"
+                    },
+                    "quotes_count": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "quotes": {
+                      "items": {
+                        "$ref": "#/components/schemas/quote"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "has_more",
+                    "quotes_count",
+                    "quotes"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      }
+    },
+    "/quotes/{id}": {
+      "get": {
+        "operationId": "getQuoteById",
+        "summary": "Retrieves a quote object.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quote object successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/quote"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      }
+    },
+    "/rates": {
+      "get": {
+        "operationId": "getAllRates",
+        "summary": "Retrieves all VAT rate objects, including standard VAT rates and VAT rates for digital products.",
+        "parameters": [
+          {
+            "name": "country_code",
+            "in": "query",
+            "description": "Filter results by a 2-letter ISO country code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "member_state",
+            "in": "query",
+            "description": "Boolean to filter results by EU Member State.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Integer for the current page.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rate objects successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "has_more": {
+                      "description": "True if this list has another page of items after this one that can be fetched.",
+                      "type": "boolean"
+                    },
+                    "rates_count": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "rates": {
+                      "items": {
+                        "$ref": "#/components/schemas/rate"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "has_more",
+                    "rates_count",
+                    "rates"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "publicKey": [],
+            "secretKey": []
+          }
+        ]
+      }
+    },
+    "/rates/geolocate": {
+      "get": {
+        "operationId": "getRateByIPAddress",
+        "summary": "Retrieves a geolocated VAT rate by IP address.",
+        "parameters": [
+          {
+            "name": "ip_address",
+            "in": "query",
+            "description": "IPv4 or IPv6 address to geolocate. If none is provided, the IP address of the request is used.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rate object successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/rate"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "publicKey": [],
+            "secretKey": []
+          }
+        ]
+      }
+    },
+    "/supplies": {
+      "post": {
+        "operationId": "createSupply",
+        "summary": "Creates a supply object.",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "integer",
+                    "description": "Amount in **cents** (e.g. 100.50 must be expressed as 10050). This common common workaround prevents unexpected rounding issues."
+                  },
+                  "amount_refunded": {
+                    "type": "integer",
+                    "description": "Amount in cents refunded back to the customer."
+                  },
+                  "country_code": {
+                    "type": "string",
+                    "description": "2-letter ISO country code of the place of supply that is relevant for the `vat.rate`."
+                  },
+                  "currency": {
+                    "type": "string",
+                    "description": "3-letter ISO 4217 currency code used to charge the `amount`. The currency is used to correctly convert to your reporting currency."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "A custom string to describe the supplied item."
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "description": "Unique identifier of an [evidence object](https://vatstack.com/docs/evidences). The pieces of non-contradictory evidence contained therein will affect the `evidence_status`.",
+                    "format": "uuid"
+                  },
+                  "invoice_number": {
+                    "type": "string",
+                    "description": "A custom string for the invoice number issued to the customer. It’s advisable to follow sequential numbering."
+                  },
+                  "issued": {
+                    "type": "string",
+                    "description": "ISO date at which the invoice was issued to the customer."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "A custom string for the name of the customer."
+                  },
+                  "notes": {
+                    "type": "string",
+                    "description": "A custom string for additional notes."
+                  },
+                  "validation": {
+                    "type": "string",
+                    "description": "Unique identifier of a [validation object](https://vatstack.com/docs/validations). This is useful if you let your customer enter a VAT number beforehand. Its valid value can affect `vat.amount`, `vat.rate` and `amount_total` when zero-rating.",
+                    "format": "uuid"
+                  },
+                  "vat": {
+                    "type": "object",
+                    "properties": {
+                      "inclusive": {
+                        "type": "boolean",
+                        "description": "Boolean for whether the resulting VAT amount should be calculated inclusive or exclusive of VAT. Defaults to `false`. All other `vat` fields will be hydrated for you."
+                      },
+                      "rate": {
+                        "type": "number",
+                        "description": "VAT rate must be either the `standard_rate` or one of the `reduced_rates` in the [rate object](https://vatstack.com/docs/rates) of `country_code`. If an invalid VAT rate is provided, it is automatically replaced with the `standard_rate`. The recommended way is to use the VAT rate determined by a previously generated [quote object](https://vatstack.com/docs/quotes) during checkout.",
+                        "format": "double"
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "amount",
+                  "country_code",
+                  "invoice_number",
+                  "issued"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Supply object successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/supply"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getAllSupplies",
+        "summary": "Retrieves all supply objects in order of creation, with the most recent appearing highest.",
+        "parameters": [
+          {
+            "name": "country_code",
+            "in": "query",
+            "description": "The 2-letter ISO country code by which you want to filter your records.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "issued_since",
+            "in": "query",
+            "description": "Show only objects where the `issued` date is this date or later. Format `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "issued_until",
+            "in": "query",
+            "description": "Show only objects where the `issued` date is this date or earlier. Format `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Show only objects with that customer name.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Integer for the current page.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Supply objects successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "has_more": {
+                      "description": "True if this list has another page of items after this one that can be fetched.",
+                      "type": "boolean"
+                    },
+                    "supplies_count": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "supplies": {
+                      "items": {
+                        "$ref": "#/components/schemas/supply"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "has_more",
+                    "supplies_count",
+                    "supplies"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      }
+    },
+    "/supplies/{id}": {
+      "get": {
+        "operationId": "getSupplyById",
+        "summary": "Retrieves a supply object.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Supply object successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/supply"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateSupplyById",
+        "summary": "Updates a supply object by the {id} path parameter.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "integer",
+                    "description": "Amount in **cents** (e.g. 100.50 must be expressed as 10050). This common common workaround prevents unexpected rounding issues."
+                  },
+                  "amount_refunded": {
+                    "type": "integer",
+                    "description": "Amount in cents refunded back to the customer."
+                  },
+                  "country_code": {
+                    "type": "string",
+                    "description": "2-letter ISO country code of the place of supply that is relevant for the `vat.rate`."
+                  },
+                  "currency": {
+                    "type": "string",
+                    "description": "3-letter ISO 4217 currency code used to charge the `amount`. The currency is used to correctly convert to your reporting currency."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "A custom string to describe the supplied item."
+                  },
+                  "evidence": {
+                    "type": "string",
+                    "description": "Unique identifier of an [evidence object](https://vatstack.com/docs/evidences). The pieces of non-contradictory evidence contained therein will affect the `evidence_status`.",
+                    "format": "uuid"
+                  },
+                  "invoice_number": {
+                    "type": "string",
+                    "description": "A custom string for the invoice number issued to the customer. It’s advisable to follow sequential numbering."
+                  },
+                  "issued": {
+                    "type": "string",
+                    "description": "ISO date at which the invoice was issued to the customer."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "A custom string for the name of the customer."
+                  },
+                  "notes": {
+                    "type": "string",
+                    "description": "A custom string for additional notes."
+                  },
+                  "validation": {
+                    "type": "string",
+                    "description": "Unique identifier of a [validation object](https://vatstack.com/docs/validations). This is useful if you let your customer enter a VAT number beforehand. Its valid value can affect `vat.amount`, `vat.rate` and `amount_total` when zero-rating.",
+                    "format": "uuid"
+                  },
+                  "vat": {
+                    "type": "object",
+                    "properties": {
+                      "inclusive": {
+                        "type": "boolean",
+                        "description": "Boolean for whether the resulting VAT amount should be calculated inclusive or exclusive of VAT. Defaults to `false`. All other `vat` fields will be hydrated for you."
+                      },
+                      "rate": {
+                        "type": "number",
+                        "description": "VAT rate must be either the `standard_rate` or one of the `reduced_rates` in the [rate object](https://vatstack.com/docs/rates) of `country_code`. If an invalid VAT rate is provided, it is automatically replaced with the `standard_rate`. The recommended way is to use the VAT rate determined by a previously generated [quote object](https://vatstack.com/docs/quotes) during checkout.",
+                        "format": "double"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Supply object successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/supply"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteSupplyById",
+        "summary": "Deletes a supply object by the {id} path parameter.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Supply object successfully deleted."
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      }
+    },
+    "/validations": {
+      "post": {
+        "operationId": "createValidation",
+        "summary": "Creates a validation object.",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "description": "Restrict validation to a region. If not provided, the type is automatically determined based on the VAT number given.",
+                    "enum": [
+                      "au_gst",
+                      "ch_vat",
+                      "eu_oss_vat",
+                      "eu_vat",
+                      "gb_vat",
+                      "no_vat",
+                      "sg_gst"
+                    ]
+                  },
+                  "query": {
+                    "type": "string",
+                    "description": "VAT number that you want to validate."
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Validation object successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/validation"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Validation request was accepted and will resume asynchronously.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/validation"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "publicKey": [],
+            "secretKey": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getAllValidations",
+        "summary": "Retrieves all validation objects in order of creation, with the most recent appearing highest.",
+        "parameters": [
+          {
+            "name": "batch",
+            "in": "query",
+            "description": "Show only objects that belong to a batch with the given identifier.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Integer for the current page.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "description": "The VAT number you want to search in the `query` field of your records.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "requested_since",
+            "in": "query",
+            "description": "Show only objects where the `requested` date is this date or later. Format `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "requested_until",
+            "in": "query",
+            "description": "Show only objects where the `requested` date is this date or earlier. Format `YYYY-MM-DD`.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Show only objects of specified type field.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "au_gst",
+                "ch_vat",
+                "eu_oss_vat",
+                "eu_vat",
+                "gb_vat",
+                "no_vat",
+                "sg_gst"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Validation objects successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "has_more": {
+                      "description": "True if this list has another page of items after this one that can be fetched.",
+                      "type": "boolean"
+                    },
+                    "validations_count": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "validations": {
+                      "items": {
+                        "$ref": "#/components/schemas/validation"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "has_more",
+                    "validations_count",
+                    "validations"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "secretKey": []
+          }
+        ]
+      }
+    },
+    "/validations/{id}": {
+      "get": {
+        "operationId": "getValidationById",
+        "summary": "Retrieves a validation object.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Validation object successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/validation"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "publicKey": [],
+            "secretKey": []
+          }
+        ]
+      }
+    },
+    "delete": {
+      "operationId": "deleteValidationById",
+      "summary": "Deletes a validation object by the {id} path parameter.",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "responses": {
+        "204": {
+          "description": "Validation object successfully deleted."
+        },
+        "default": {
+          "description": "Error response.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/error"
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "secretKey": []
+        }
+      ]
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.vatstack.com/{basePath}",
+      "description": "Production API server.",
+      "variables": {
+        "basePath": {
+          "default": "v1"
+        }
+      }
+    }
+  ]
+}

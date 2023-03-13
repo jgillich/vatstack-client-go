@@ -1,0 +1,2404 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: team@vatstack.com
+  description: "A suite of VAT APIs which let you validate VAT numbers with government\
+    \ services, look up VAT rates by ISO country code, calculate price quotes with\
+    \ centralized VAT rules and store transactions with each sale for VAT reporting."
+  title: Vatstack API Specification
+  version: 1.3.0
+externalDocs:
+  description: Vatstack API Reference
+  url: https://vatstack.com/docs
+servers:
+- description: Production API server.
+  url: "https://api.vatstack.com/{basePath}"
+  variables:
+    basePath:
+      default: v1
+paths:
+  /batches:
+    get:
+      operationId: getAllBatches
+      parameters:
+      - description: "A limit on the number of objects to be returned. Limit can range\
+          \ between 1 and 100, and the default is 20."
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: Integer for the current page.
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: Show only objects with the given `status`.
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllBatches_200_response'
+          description: Batch objects successfully retrieved.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: "Retrieves all batch objects in order of creation, with the latest\
+        \ appearing highest."
+    post:
+      operationId: createBatch
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/createBatch_request'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/batch'
+          description: Batch object successfully created.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: Creates a batch object.
+  /batches/{id}:
+    delete:
+      operationId: deleteBatchById
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Batch object successfully deleted.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: "Deletes a batch object by the {id} path parameter."
+    get:
+      operationId: getBatchById
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/batch'
+          description: Batch object successfully retrieved.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: "Retrieves a batch object by the {id} path parameter."
+    put:
+      operationId: updateBatchById
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/updateBatchById_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/batch'
+          description: Batch object successfully updated.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: "Updates a batch object by the {id} path parameter."
+  /evidences:
+    get:
+      operationId: getAllEvidences
+      parameters:
+      - description: "A limit on the number of objects to be returned. Limit can range\
+          \ between 1 and 100, and the default is 20."
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: Integer for the current page.
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllEvidences_200_response'
+          description: Evidence objects successfully retrieved.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: "Retrieves all evidence objects in order of creation, with the latest\
+        \ appearing highest."
+    post:
+      operationId: createEvidence
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/createEvidence_request'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/evidence'
+          description: Evidence object successfully created.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: Creates an evidence object.
+  /evidences/{id}:
+    get:
+      operationId: getEvidenceById
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/evidence'
+          description: Evidence object successfully retrieved.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: "Retrieves an evidence object by the {id} path parameter."
+    put:
+      operationId: updateEvidenceById
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/createEvidence_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/evidence'
+          description: Evidence object successfully updated.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: "Updates an evidence object by the {id} path parameter."
+  /hits:
+    get:
+      operationId: getAllHits
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/hit'
+          description: Hits successfully retrieved.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - publicKey: []
+        secretKey: []
+      summary: This endpoint can be useful if you want to perform a quick check against
+        your hits count before initiating an API request.
+  /quotes:
+    get:
+      operationId: getAllQuotes
+      parameters:
+      - description: "A limit on the number of objects to be returned. Limit can range\
+          \ between 1 and 100, and the default is 20."
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: Integer for the current page.
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllQuotes_200_response'
+          description: Quote objects successfully retrieved.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: "Retrieves all quote objects in order of creation, with the most recent\
+        \ appearing highest."
+    post:
+      operationId: createQuote
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/createQuote_request'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/quote'
+          description: Quote object successfully created.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - publicKey: []
+        secretKey: []
+      summary: Creates a quote object.
+  /quotes/{id}:
+    get:
+      operationId: getQuoteById
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/quote'
+          description: Quote object successfully retrieved.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: Retrieves a quote object.
+  /rates:
+    get:
+      operationId: getAllRates
+      parameters:
+      - description: Filter results by a 2-letter ISO country code.
+        explode: true
+        in: query
+        name: country_code
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: "A limit on the number of objects to be returned. Limit can range\
+          \ between 1 and 100, and the default is 20."
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: Boolean to filter results by EU Member State.
+        explode: true
+        in: query
+        name: member_state
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: Integer for the current page.
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllRates_200_response'
+          description: Rate objects successfully retrieved.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - publicKey: []
+        secretKey: []
+      summary: "Retrieves all VAT rate objects, including standard VAT rates and VAT\
+        \ rates for digital products."
+  /rates/geolocate:
+    get:
+      operationId: getRateByIPAddress
+      parameters:
+      - description: "IPv4 or IPv6 address to geolocate. If none is provided, the\
+          \ IP address of the request is used."
+        explode: true
+        in: query
+        name: ip_address
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rate'
+          description: Rate object successfully retrieved.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - publicKey: []
+        secretKey: []
+      summary: Retrieves a geolocated VAT rate by IP address.
+  /supplies:
+    get:
+      operationId: getAllSupplies
+      parameters:
+      - description: The 2-letter ISO country code by which you want to filter your
+          records.
+        explode: true
+        in: query
+        name: country_code
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Show only objects where the `issued` date is this date or later.
+          Format `YYYY-MM-DD`.
+        explode: true
+        in: query
+        name: issued_since
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Show only objects where the `issued` date is this date or earlier.
+          Format `YYYY-MM-DD`.
+        explode: true
+        in: query
+        name: issued_until
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: "A limit on the number of objects to be returned. Limit can range\
+          \ between 1 and 100, and the default is 20."
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: Show only objects with that customer name.
+        explode: true
+        in: query
+        name: name
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Integer for the current page.
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllSupplies_200_response'
+          description: Supply objects successfully retrieved.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: "Retrieves all supply objects in order of creation, with the most recent\
+        \ appearing highest."
+    post:
+      operationId: createSupply
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/createSupply_request'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/supply'
+          description: Supply object successfully created.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: Creates a supply object.
+  /supplies/{id}:
+    delete:
+      operationId: deleteSupplyById
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Supply object successfully deleted.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: "Deletes a supply object by the {id} path parameter."
+    get:
+      operationId: getSupplyById
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/supply'
+          description: Supply object successfully retrieved.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: Retrieves a supply object.
+    put:
+      operationId: updateSupplyById
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/updateSupplyById_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/supply'
+          description: Supply object successfully updated.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: "Updates a supply object by the {id} path parameter."
+  /validations:
+    get:
+      operationId: getAllValidations
+      parameters:
+      - description: Show only objects that belong to a batch with the given identifier.
+        explode: true
+        in: query
+        name: batch
+        required: false
+        schema:
+          format: uuid
+          type: string
+        style: form
+      - description: "A limit on the number of objects to be returned. Limit can range\
+          \ between 1 and 100, and the default is 20."
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: Integer for the current page.
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: The VAT number you want to search in the `query` field of your
+          records.
+        explode: true
+        in: query
+        name: query
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Show only objects where the `requested` date is this date or
+          later. Format `YYYY-MM-DD`.
+        explode: true
+        in: query
+        name: requested_since
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Show only objects where the `requested` date is this date or
+          earlier. Format `YYYY-MM-DD`.
+        explode: true
+        in: query
+        name: requested_until
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - description: Show only objects of specified type field.
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          enum:
+          - au_gst
+          - ch_vat
+          - eu_oss_vat
+          - eu_vat
+          - gb_vat
+          - no_vat
+          - sg_gst
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAllValidations_200_response'
+          description: Validation objects successfully retrieved.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - secretKey: []
+      summary: "Retrieves all validation objects in order of creation, with the most\
+        \ recent appearing highest."
+    post:
+      operationId: createValidation
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/createValidation_request'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validation'
+          description: Validation object successfully created.
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validation'
+          description: Validation request was accepted and will resume asynchronously.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - publicKey: []
+        secretKey: []
+      summary: Creates a validation object.
+  /validations/{id}:
+    get:
+      operationId: getValidationById
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/validation'
+          description: Validation object successfully retrieved.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Error response.
+      security:
+      - publicKey: []
+        secretKey: []
+      summary: Retrieves a validation object.
+  delete:
+    summary: "Deletes a validation object by the {id} path parameter."
+components:
+  schemas:
+    batch:
+      description: "Batch mass VAT number validations for due dates. Add VAT numbers\
+        \ in bulk or append VAT numbers incrementally to your existing batch process,\
+        \ then start it whenever required."
+      example:
+        succeeded_count: 6
+        queries_ignored:
+        - queries_ignored
+        - queries_ignored
+        created: 2000-01-23T04:56:07.000+00:00
+        scheduled: 2000-01-23T04:56:07.000+00:00
+        name: name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        validations:
+        - company_type: company_type
+          code: code
+          created: 2000-01-23T04:56:07.000+00:00
+          valid_format: true
+          vat_number: vat_number
+          query: query
+          active: true
+          type: au_gst
+          company_address: company_address
+          valid: true
+          country_code: country_code
+          requested: 2000-01-23T04:56:07.000+00:00
+          company_name: company_name
+          consultation_number: consultation_number
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          updated: 2000-01-23T04:56:07.000+00:00
+        - company_type: company_type
+          code: code
+          created: 2000-01-23T04:56:07.000+00:00
+          valid_format: true
+          vat_number: vat_number
+          query: query
+          active: true
+          type: au_gst
+          company_address: company_address
+          valid: true
+          country_code: country_code
+          requested: 2000-01-23T04:56:07.000+00:00
+          company_name: company_name
+          consultation_number: consultation_number
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          updated: 2000-01-23T04:56:07.000+00:00
+        queries:
+        - queries
+        - queries
+        updated: 2000-01-23T04:56:07.000+00:00
+      properties:
+        created:
+          description: ISO date at which the object was created.
+          format: date-time
+          type: string
+        id:
+          description: Unique identifier for the object.
+          format: uuid
+          type: string
+        name:
+          description: Descriptive name of the object.
+          type: string
+        queries:
+          description: Array of all queries in the order of your input.
+          items:
+            type: string
+          type: array
+        queries_ignored:
+          description: Array of all queries which are of invalid format. Ignored queries
+            are automatically identified upon your input. Its items will not be validated.
+          items:
+            type: string
+          type: array
+        scheduled:
+          description: ISO date at which the object status was changed to `scheduled`.
+            Defaults to `null` while the status is `pending`.
+          format: date-time
+          type: string
+        succeeded_count:
+          description: The number of `validations` where `valid` is `true` or `false`.
+            It’s an indicator for how far the batch has progressed.
+          format: int32
+          type: integer
+        updated:
+          description: ISO date at which the object was updated.
+          format: date-time
+          type: string
+        validations:
+          description: "Array of the first 20 validation objects in the order of `queries`.\
+            \ If an `id` is shown in the object, it was created for the batch and\
+            \ you can retrieve it individually. See [validation object](https://vatstack.com/docs/validations)\
+            \ for reference."
+          items:
+            $ref: '#/components/schemas/validation'
+          type: array
+      required:
+      - name
+      type: object
+    error:
+      description: Error response from the Vatstack API.
+      properties:
+        code:
+          description: "For validations, a short string indicating the [error code](https://vatstack.com/docs/validations)."
+          maxLength: 50
+          type: string
+        message:
+          description: Human-readable message providing more details about the error.
+          maxLength: 250
+          type: string
+      type: object
+    evidence:
+      description: Store pieces of evidence that confirm your customer’s location.
+        Evidence object can be attached to a supply object and it can only be attached
+        to one supply object at a time.
+      example:
+        created: 2000-01-23T04:56:07.000+00:00
+        bank_address:
+          country_code: country_code
+          name: name
+        required_count: 6
+        billing_address:
+          line_1: line_1
+          country_code: country_code
+          line_2: line_2
+          city: city
+          state: state
+          postal_code: postal_code
+        ip_address:
+          country_code: country_code
+          provider: provider
+          city: city
+          label: label
+          state: state
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        updated: 2000-01-23T04:56:07.000+00:00
+      properties:
+        bank_address:
+          $ref: '#/components/schemas/evidence_bank_address'
+        billing_address:
+          $ref: '#/components/schemas/evidence_billing_address'
+        created:
+          description: ISO date at which the object was created.
+          format: date-time
+          type: string
+        ip_address:
+          $ref: '#/components/schemas/evidence_ip_address'
+        id:
+          description: Unique identifier for the object.
+          format: uuid
+          type: string
+        required_count:
+          description: Required pieces of evidence according to your account’s regional
+            settings.
+          format: int32
+          type: integer
+        updated:
+          description: ISO date at which the object was updated.
+          format: date-time
+          type: string
+      type: object
+    hit:
+      description: Retrieve the number of hits you have used for the running month
+        and the total capacity allocated to your current subscription plan.
+      example:
+        supplies:
+          used: 6
+          capacity: 0
+        validations:
+          used: 5
+          capacity: 1
+      properties:
+        supplies:
+          $ref: '#/components/schemas/hit_supplies'
+        validations:
+          $ref: '#/components/schemas/hit_validations'
+      type: object
+    quote:
+      description: "The quote object combines the best of the [rate object](https://vatstack.com/docs/rates)\
+        \ and [validation object](https://vatstack.com/docs/validations) and takes\
+        \ them a step further. It uses your existing business information to perform\
+        \ the entire VAT-compliant business logic for you. All VAT rules have been\
+        \ centralized so that every response is directly actionable."
+      example:
+        amount: 6
+        created: 2000-01-23T04:56:07.000+00:00
+        amount_total: 1
+        vat:
+          rate_type: rate_type
+          inclusive: "false"
+          amount: 5
+          rate: 5.637376656633329
+          abbreviation: abbreviation
+          local_name: local_name
+        ip_address: ip_address
+        local_name: local_name
+        country_code: country_code
+        member_state: true
+        country_name: country_name
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        category: category
+        updated: 2000-01-23T04:56:07.000+00:00
+        validation:
+          company_type: company_type
+          code: code
+          created: 2000-01-23T04:56:07.000+00:00
+          valid_format: true
+          vat_number: vat_number
+          query: query
+          active: true
+          type: au_gst
+          company_address: company_address
+          valid: true
+          country_code: country_code
+          requested: 2000-01-23T04:56:07.000+00:00
+          company_name: company_name
+          consultation_number: consultation_number
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          updated: 2000-01-23T04:56:07.000+00:00
+      properties:
+        amount:
+          format: int32
+          type: integer
+        amount_total:
+          format: int32
+          type: integer
+        category:
+          description: Category of the digital product. Defaults to `null` if no category
+            was specified in the request or if the category cannot be applied for
+            the `country_code`.
+          type: string
+        country_code:
+          description: 2-letter ISO country code.
+          maxLength: 2
+          minLength: 2
+          type: string
+        country_name:
+          description: Corresponding English name of `country_code`.
+          type: string
+        created:
+          description: ISO date at which the object was created.
+          format: date-time
+          type: string
+        id:
+          description: Unique identifier for the object.
+          format: uuid
+          type: string
+        ip_address:
+          description: "The same IP address coming from the `ip_address` body parameter,\
+            \ or the geolocated IP address if none was provided. Value is `null` if\
+            \ `country_code` was provided."
+          type: string
+        local_name:
+          description: Localized name of the VAT identification number.
+          type: string
+        member_state:
+          description: Boolean indicating whether `country_code` is an EU member state.
+          type: boolean
+        updated:
+          description: ISO date at which the object was updated.
+          format: date-time
+          type: string
+        validation:
+          $ref: '#/components/schemas/validation'
+        vat:
+          $ref: '#/components/schemas/quote_vat'
+      type: object
+    rate:
+      description: Keep the rates of your application up-to-date with a regular VAT
+        rate lookup. This ensures that your invoice states the correct VAT across
+        EU Member States. We have also started to add countries outside the EU and
+        will keep them updated.
+      example:
+        country_code: country_code
+        reduced_rates:
+        - 9.301444243932576
+        - 9.301444243932576
+        member_state: true
+        vat_abbreviation: vat_abbreviation
+        country_name: country_name
+        currency: currency
+        vat_local_name: vat_local_name
+        categories:
+          audiobook: 6.027456183070403
+          ebook: 5.962133916683182
+          eperiodical: 5.637376656633329
+          eservice: 2.3021358869347655
+          telecommunication: 7.061401241503109
+          broadcasting: 1.4658129805029452
+        standard_rate: 3.616076749251911
+        abbreviation: abbreviation
+        local_name: local_name
+      properties:
+        abbreviation:
+          description: Abbreviation of `local_name`.
+          type: string
+        categories:
+          $ref: '#/components/schemas/rate_categories'
+        country_code:
+          description: 2-letter ISO country code.
+          maxLength: 2
+          minLength: 2
+          type: string
+        country_name:
+          description: Corresponding English name of `country_code`.
+          type: string
+        currency:
+          description: 3-letter ISO 4217 local currency code.
+          maxLength: 3
+          minLength: 3
+          type: string
+        local_name:
+          description: Localized name of the VAT identification number.
+          type: string
+        member_state:
+          description: Boolean indicating whether the country is an EU Member State.
+          type: boolean
+        reduced_rates:
+          description: 3-letter ISO 4217 local currency code.
+          items:
+            format: double
+            type: number
+          type: array
+        standard_rate:
+          description: Standard VAT rate in percent.
+          format: double
+          type: number
+        vat_abbreviation:
+          description: Abbreviation of `vat_local_name`.
+          type: string
+        vat_local_name:
+          description: Localized name of the VAT.
+          type: string
+      type: object
+    supply:
+      description: "Supplies are transactions of telecommunications, broadcasting\
+        \ and electronic (TBE) services. To document pieces of evidence for the place\
+        \ of supply, you can attach [evidence objects](https://vatstack.com/docs/evidences)\
+        \ to a supply object. Supplies are also used to automatically generate a quarterly\
+        \ tax report with currency conversion at official exchange rates."
+      example:
+        amount: 6
+        notes: notes
+        evidence:
+          created: 2000-01-23T04:56:07.000+00:00
+          bank_address:
+            country_code: country_code
+            name: name
+          required_count: 6
+          billing_address:
+            line_1: line_1
+            country_code: country_code
+            line_2: line_2
+            city: city
+            state: state
+            postal_code: postal_code
+          ip_address:
+            country_code: country_code
+            provider: provider
+            city: city
+            label: label
+            state: state
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          updated: 2000-01-23T04:56:07.000+00:00
+        created: 2000-01-23T04:56:07.000+00:00
+        amount_total: 5
+        vat:
+          rate_type: rate_type
+          inclusive: "false"
+          amount: 5
+          rate: 2.3021358869347655
+        description: description
+        amount_refunded: 1
+        country_code: country_code
+        evidence_status: evidence_status
+        name: name
+        currency: currency
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        issued: 2000-01-23T04:56:07.000+00:00
+        invoice_number: invoice_number
+        updated: 2000-01-23T04:56:07.000+00:00
+        validation:
+          company_type: company_type
+          code: code
+          created: 2000-01-23T04:56:07.000+00:00
+          valid_format: true
+          vat_number: vat_number
+          query: query
+          active: true
+          type: au_gst
+          company_address: company_address
+          valid: true
+          country_code: country_code
+          requested: 2000-01-23T04:56:07.000+00:00
+          company_name: company_name
+          consultation_number: consultation_number
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          updated: 2000-01-23T04:56:07.000+00:00
+      properties:
+        amount:
+          format: int32
+          type: integer
+        amount_refunded:
+          format: int32
+          type: integer
+        amount_total:
+          format: int32
+          type: integer
+        country_code:
+          description: 2-letter ISO country code of the place of supply that is relevant
+            for the `vat.rate`.
+          maxLength: 2
+          minLength: 2
+          type: string
+        created:
+          description: ISO date at which the object was created.
+          format: date-time
+          type: string
+        currency:
+          description: 3-letter ISO 4217 currency code used to charge the `amount`.
+          maxLength: 3
+          minLength: 3
+          type: string
+        description:
+          description: An arbitrary string to describe the supplied item. Often useful
+            for displaying to users.
+          type: string
+        evidence:
+          $ref: '#/components/schemas/evidence'
+        evidence_status:
+          description: Status of whether the attached evidence object sufficiently
+            proves the place of supply established in `country_code`. Will be either
+            `sufficient` or `insufficient`.
+          type: string
+        id:
+          description: Unique identifier for the object.
+          format: uuid
+          type: string
+        invoice_number:
+          description: A custom string for the invoice number issued to the customer.
+            It’s advisable to follow sequential numbering.
+          type: string
+        issued:
+          description: ISO date at which `invoice_number` was issued.
+          format: date-time
+          type: string
+        name:
+          description: A custom string for the name of the customer.
+          type: string
+        notes:
+          description: A custom string for additional notes.
+          type: string
+        updated:
+          description: ISO date at which the object was updated.
+          format: date-time
+          type: string
+        validation:
+          $ref: '#/components/schemas/validation'
+        vat:
+          $ref: '#/components/schemas/supply_vat'
+      required:
+      - amount
+      - country_code
+      - currency
+      - invoice_number
+      - issued
+      type: object
+    validation:
+      description: Validate your business customer’s VAT number against official government
+        servers in real-time. The API asynchronously validates VAT numbers for you
+        if government services experience downtime.
+      example:
+        company_type: company_type
+        code: code
+        created: 2000-01-23T04:56:07.000+00:00
+        valid_format: true
+        vat_number: vat_number
+        query: query
+        active: true
+        type: au_gst
+        company_address: company_address
+        valid: true
+        country_code: country_code
+        requested: 2000-01-23T04:56:07.000+00:00
+        company_name: company_name
+        consultation_number: consultation_number
+        id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        updated: 2000-01-23T04:56:07.000+00:00
+      properties:
+        active:
+          description: Boolean indicating whether the company exists and is active.
+            Use `valid` to check whether the business is also VAT-registered.
+          type: boolean
+        code:
+          description: "In the event of an error, this field will contain the error\
+            \ code."
+          type: string
+        company_address:
+          description: Address of the company the VAT number is associated with. Servers
+            of Germany and Spain won’t return a value for privacy reasons and will
+            default to `null`.
+          type: string
+        company_name:
+          description: Name of the company the VAT number is associated with. Servers
+            of Germany and Spain won’t return a value for privacy reasons and will
+            default to `null`.
+          type: string
+        company_type:
+          description: Type of the company entity returned by the respective government
+            service (where available).
+          type: string
+        consultation_number:
+          description: "If you save your own VAT number in your dashboard, the reply\
+            \ will contain a unique consultation number. The consultation number enables\
+            \ you to prove to a tax administration of a Member State that you have\
+            \ checked a VAT number at the `requested` date, and obtained a validation\
+            \ result."
+          type: string
+        country_code:
+          description: "2-letter ISO country code. Note that while Greek VAT numbers\
+            \ contain the `EL` country code, our response will return the ISO country\
+            \ code `GR`."
+          maxLength: 2
+          minLength: 2
+          type: string
+        created:
+          description: ISO date at which the object was created.
+          format: date-time
+          type: string
+        id:
+          description: Unique identifier for the object.
+          format: uuid
+          type: string
+        query:
+          description: Your original query.
+          type: string
+        requested:
+          description: ISO date at which the validation request was originally performed.
+            Types `eu_vat` and `gb_vat` do not specify a time.
+          format: date-time
+          type: string
+        type:
+          description: Type of VAT number.
+          enum:
+          - au_gst
+          - ch_vat
+          - eu_oss_vat
+          - eu_vat
+          - gb_vat
+          - no_vat
+          - sg_gst
+          type: string
+        updated:
+          description: ISO date at which the object was updated.
+          format: date-time
+          type: string
+        valid:
+          description: "Boolean indicating whether the vat_number is registered for\
+            \ VAT. If government services are down, the value will be `null` and re-checked\
+            \ automatically for you."
+          type: boolean
+        valid_format:
+          description: Boolean indicating whether the VAT number contained in `query`
+            is in a valid format.
+          type: boolean
+        vat_number:
+          description: VAT number extracted from your query without the country code.
+          type: string
+      required:
+      - query
+      type: object
+    getAllBatches_200_response:
+      example:
+        batches:
+        - succeeded_count: 6
+          queries_ignored:
+          - queries_ignored
+          - queries_ignored
+          created: 2000-01-23T04:56:07.000+00:00
+          scheduled: 2000-01-23T04:56:07.000+00:00
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          validations:
+          - company_type: company_type
+            code: code
+            created: 2000-01-23T04:56:07.000+00:00
+            valid_format: true
+            vat_number: vat_number
+            query: query
+            active: true
+            type: au_gst
+            company_address: company_address
+            valid: true
+            country_code: country_code
+            requested: 2000-01-23T04:56:07.000+00:00
+            company_name: company_name
+            consultation_number: consultation_number
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            updated: 2000-01-23T04:56:07.000+00:00
+          - company_type: company_type
+            code: code
+            created: 2000-01-23T04:56:07.000+00:00
+            valid_format: true
+            vat_number: vat_number
+            query: query
+            active: true
+            type: au_gst
+            company_address: company_address
+            valid: true
+            country_code: country_code
+            requested: 2000-01-23T04:56:07.000+00:00
+            company_name: company_name
+            consultation_number: consultation_number
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            updated: 2000-01-23T04:56:07.000+00:00
+          queries:
+          - queries
+          - queries
+          updated: 2000-01-23T04:56:07.000+00:00
+        - succeeded_count: 6
+          queries_ignored:
+          - queries_ignored
+          - queries_ignored
+          created: 2000-01-23T04:56:07.000+00:00
+          scheduled: 2000-01-23T04:56:07.000+00:00
+          name: name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          validations:
+          - company_type: company_type
+            code: code
+            created: 2000-01-23T04:56:07.000+00:00
+            valid_format: true
+            vat_number: vat_number
+            query: query
+            active: true
+            type: au_gst
+            company_address: company_address
+            valid: true
+            country_code: country_code
+            requested: 2000-01-23T04:56:07.000+00:00
+            company_name: company_name
+            consultation_number: consultation_number
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            updated: 2000-01-23T04:56:07.000+00:00
+          - company_type: company_type
+            code: code
+            created: 2000-01-23T04:56:07.000+00:00
+            valid_format: true
+            vat_number: vat_number
+            query: query
+            active: true
+            type: au_gst
+            company_address: company_address
+            valid: true
+            country_code: country_code
+            requested: 2000-01-23T04:56:07.000+00:00
+            company_name: company_name
+            consultation_number: consultation_number
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            updated: 2000-01-23T04:56:07.000+00:00
+          queries:
+          - queries
+          - queries
+          updated: 2000-01-23T04:56:07.000+00:00
+        has_more: true
+        batches_count: 0
+      properties:
+        has_more:
+          description: True if this list has another page of items after this one
+            that can be fetched.
+          type: boolean
+        batches_count:
+          format: int32
+          type: integer
+        batches:
+          items:
+            $ref: '#/components/schemas/batch'
+          type: array
+      required:
+      - batches
+      - batches_count
+      - has_more
+      type: object
+    createBatch_request:
+      properties:
+        name:
+          description: Descriptive name of the batch object. Give it any name you
+            like to serve for your reference.
+          type: string
+        queries:
+          description: Array of VAT numbers to be queried. Should be an array of strings.
+          items:
+            type: string
+          type: array
+      required:
+      - name
+      type: object
+    updateBatchById_request:
+      properties:
+        mode:
+          description: "Either `append` to append an array of queries to the existing\
+            \ array of queries, or `replace` to empty the existing array of queries\
+            \ prior to adding. Defaults to `append`."
+          enum:
+          - append
+          - replace
+          type: string
+        name:
+          description: Descriptive name of the batch object. Give it any name you
+            like to serve for your reference.
+          type: string
+        queries:
+          description: Array of VAT numbers to be added while considering the `mode`.
+          items:
+            type: string
+          type: array
+        status:
+          description: Set it to `scheduled` once you want to schedule the validation
+            process with the queries provided. It’s possible to add queries and change
+            the status in one go.
+          enum:
+          - scheduled
+          type: string
+      type: object
+    getAllEvidences_200_response:
+      example:
+        evidences_count: 0
+        has_more: true
+        evidences:
+        - created: 2000-01-23T04:56:07.000+00:00
+          bank_address:
+            country_code: country_code
+            name: name
+          required_count: 6
+          billing_address:
+            line_1: line_1
+            country_code: country_code
+            line_2: line_2
+            city: city
+            state: state
+            postal_code: postal_code
+          ip_address:
+            country_code: country_code
+            provider: provider
+            city: city
+            label: label
+            state: state
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          updated: 2000-01-23T04:56:07.000+00:00
+        - created: 2000-01-23T04:56:07.000+00:00
+          bank_address:
+            country_code: country_code
+            name: name
+          required_count: 6
+          billing_address:
+            line_1: line_1
+            country_code: country_code
+            line_2: line_2
+            city: city
+            state: state
+            postal_code: postal_code
+          ip_address:
+            country_code: country_code
+            provider: provider
+            city: city
+            label: label
+            state: state
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          updated: 2000-01-23T04:56:07.000+00:00
+      properties:
+        has_more:
+          description: True if this list has another page of items after this one
+            that can be fetched.
+          type: boolean
+        evidences_count:
+          format: int32
+          type: integer
+        evidences:
+          items:
+            $ref: '#/components/schemas/evidence'
+          type: array
+      required:
+      - evidences
+      - evidences_count
+      - has_more
+      type: object
+    createEvidence_request_bank_address:
+      properties:
+        name:
+          description: Name of the bank or payment source used by the customer. This
+            information is usually provided by your payments provider.
+          type: string
+        country_code:
+          description: 2-letter ISO country code of the bank or payment source. This
+            information is usually provided by your payments provider.
+          type: string
+      type: object
+    createEvidence_request_billing_address:
+      properties:
+        city:
+          description: City of the customer’s billing address.
+          type: string
+        country_code:
+          description: 2-letter ISO country code of the customer’s billing address.
+          type: string
+        line_1:
+          description: Line 1 of the customer’s billing address.
+          type: string
+        line_2:
+          description: Line 2 of the customer’s billing address.
+          type: string
+        postal_code:
+          description: Postal code of the customer’s billing address.
+          type: string
+        state:
+          description: State of the customer’s billing address.
+          type: string
+      type: object
+    createEvidence_request_ip_address:
+      properties:
+        label:
+          description: IP address of the customer at the time of supply. We will automatically
+            geolocate this IP address and hydrate the other fields.
+          type: string
+      type: object
+    createEvidence_request:
+      properties:
+        bank_address:
+          $ref: '#/components/schemas/createEvidence_request_bank_address'
+        billing_address:
+          $ref: '#/components/schemas/createEvidence_request_billing_address'
+        ip_address:
+          $ref: '#/components/schemas/createEvidence_request_ip_address'
+      type: object
+    getAllQuotes_200_response:
+      example:
+        quotes_count: 0
+        has_more: true
+        quotes:
+        - amount: 6
+          created: 2000-01-23T04:56:07.000+00:00
+          amount_total: 1
+          vat:
+            rate_type: rate_type
+            inclusive: "false"
+            amount: 5
+            rate: 5.637376656633329
+            abbreviation: abbreviation
+            local_name: local_name
+          ip_address: ip_address
+          local_name: local_name
+          country_code: country_code
+          member_state: true
+          country_name: country_name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          category: category
+          updated: 2000-01-23T04:56:07.000+00:00
+          validation:
+            company_type: company_type
+            code: code
+            created: 2000-01-23T04:56:07.000+00:00
+            valid_format: true
+            vat_number: vat_number
+            query: query
+            active: true
+            type: au_gst
+            company_address: company_address
+            valid: true
+            country_code: country_code
+            requested: 2000-01-23T04:56:07.000+00:00
+            company_name: company_name
+            consultation_number: consultation_number
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            updated: 2000-01-23T04:56:07.000+00:00
+        - amount: 6
+          created: 2000-01-23T04:56:07.000+00:00
+          amount_total: 1
+          vat:
+            rate_type: rate_type
+            inclusive: "false"
+            amount: 5
+            rate: 5.637376656633329
+            abbreviation: abbreviation
+            local_name: local_name
+          ip_address: ip_address
+          local_name: local_name
+          country_code: country_code
+          member_state: true
+          country_name: country_name
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          category: category
+          updated: 2000-01-23T04:56:07.000+00:00
+          validation:
+            company_type: company_type
+            code: code
+            created: 2000-01-23T04:56:07.000+00:00
+            valid_format: true
+            vat_number: vat_number
+            query: query
+            active: true
+            type: au_gst
+            company_address: company_address
+            valid: true
+            country_code: country_code
+            requested: 2000-01-23T04:56:07.000+00:00
+            company_name: company_name
+            consultation_number: consultation_number
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            updated: 2000-01-23T04:56:07.000+00:00
+      properties:
+        has_more:
+          description: True if this list has another page of items after this one
+            that can be fetched.
+          type: boolean
+        quotes_count:
+          format: int32
+          type: integer
+        quotes:
+          items:
+            $ref: '#/components/schemas/quote'
+          type: array
+      required:
+      - has_more
+      - quotes
+      - quotes_count
+      type: object
+    createQuote_request_vat:
+      properties:
+        inclusive:
+          description: Boolean for whether the resulting VAT amount should be calculated
+            inclusive or exclusive of VAT. Defaults to `false`. All other `vat` fields
+            will be hydrated for you.
+          type: boolean
+      type: object
+    createQuote_request:
+      properties:
+        amount:
+          description: Amount in **cents** (e.g. 100.50 must be expressed as 10050).
+            This common common workaround prevents unexpected rounding issues.
+          type: integer
+        country_code:
+          description: "2-letter ISO country code. If provided, the `ip_address` parameter\
+            \ will be ignored."
+          type: string
+        category:
+          description: "Digital products category used for calculation. Supports `audiobook`,\
+            \ `broadcasting`, `ebook`, `eperiodical`, `eservice` and `telecommunication`."
+          type: string
+        ip_address:
+          description: "IP address to geolocate the VAT rate for. If neither IP address\
+            \ nor `country_code` is provided, it will be automatically determined\
+            \ from the request."
+          type: string
+        validation:
+          description: "Unique identifier of a [validation object](https://vatstack.com/docs/validations).\
+            \ This is useful if you let your customer enter a VAT number beforehand.\
+            \ Its valid value can affect `vat.amount`, `vat.rate` and `amount_total`\
+            \ when zero-rating."
+          format: uuid
+          type: string
+        vat:
+          $ref: '#/components/schemas/createQuote_request_vat'
+      required:
+      - amount
+      type: object
+    getAllRates_200_response:
+      example:
+        rates_count: 0
+        rates:
+        - country_code: country_code
+          reduced_rates:
+          - 9.301444243932576
+          - 9.301444243932576
+          member_state: true
+          vat_abbreviation: vat_abbreviation
+          country_name: country_name
+          currency: currency
+          vat_local_name: vat_local_name
+          categories:
+            audiobook: 6.027456183070403
+            ebook: 5.962133916683182
+            eperiodical: 5.637376656633329
+            eservice: 2.3021358869347655
+            telecommunication: 7.061401241503109
+            broadcasting: 1.4658129805029452
+          standard_rate: 3.616076749251911
+          abbreviation: abbreviation
+          local_name: local_name
+        - country_code: country_code
+          reduced_rates:
+          - 9.301444243932576
+          - 9.301444243932576
+          member_state: true
+          vat_abbreviation: vat_abbreviation
+          country_name: country_name
+          currency: currency
+          vat_local_name: vat_local_name
+          categories:
+            audiobook: 6.027456183070403
+            ebook: 5.962133916683182
+            eperiodical: 5.637376656633329
+            eservice: 2.3021358869347655
+            telecommunication: 7.061401241503109
+            broadcasting: 1.4658129805029452
+          standard_rate: 3.616076749251911
+          abbreviation: abbreviation
+          local_name: local_name
+        has_more: true
+      properties:
+        has_more:
+          description: True if this list has another page of items after this one
+            that can be fetched.
+          type: boolean
+        rates_count:
+          format: int32
+          type: integer
+        rates:
+          items:
+            $ref: '#/components/schemas/rate'
+          type: array
+      required:
+      - has_more
+      - rates
+      - rates_count
+      type: object
+    getAllSupplies_200_response:
+      example:
+        supplies_count: 0
+        supplies:
+        - amount: 6
+          notes: notes
+          evidence:
+            created: 2000-01-23T04:56:07.000+00:00
+            bank_address:
+              country_code: country_code
+              name: name
+            required_count: 6
+            billing_address:
+              line_1: line_1
+              country_code: country_code
+              line_2: line_2
+              city: city
+              state: state
+              postal_code: postal_code
+            ip_address:
+              country_code: country_code
+              provider: provider
+              city: city
+              label: label
+              state: state
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            updated: 2000-01-23T04:56:07.000+00:00
+          created: 2000-01-23T04:56:07.000+00:00
+          amount_total: 5
+          vat:
+            rate_type: rate_type
+            inclusive: "false"
+            amount: 5
+            rate: 2.3021358869347655
+          description: description
+          amount_refunded: 1
+          country_code: country_code
+          evidence_status: evidence_status
+          name: name
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          issued: 2000-01-23T04:56:07.000+00:00
+          invoice_number: invoice_number
+          updated: 2000-01-23T04:56:07.000+00:00
+          validation:
+            company_type: company_type
+            code: code
+            created: 2000-01-23T04:56:07.000+00:00
+            valid_format: true
+            vat_number: vat_number
+            query: query
+            active: true
+            type: au_gst
+            company_address: company_address
+            valid: true
+            country_code: country_code
+            requested: 2000-01-23T04:56:07.000+00:00
+            company_name: company_name
+            consultation_number: consultation_number
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            updated: 2000-01-23T04:56:07.000+00:00
+        - amount: 6
+          notes: notes
+          evidence:
+            created: 2000-01-23T04:56:07.000+00:00
+            bank_address:
+              country_code: country_code
+              name: name
+            required_count: 6
+            billing_address:
+              line_1: line_1
+              country_code: country_code
+              line_2: line_2
+              city: city
+              state: state
+              postal_code: postal_code
+            ip_address:
+              country_code: country_code
+              provider: provider
+              city: city
+              label: label
+              state: state
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            updated: 2000-01-23T04:56:07.000+00:00
+          created: 2000-01-23T04:56:07.000+00:00
+          amount_total: 5
+          vat:
+            rate_type: rate_type
+            inclusive: "false"
+            amount: 5
+            rate: 2.3021358869347655
+          description: description
+          amount_refunded: 1
+          country_code: country_code
+          evidence_status: evidence_status
+          name: name
+          currency: currency
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          issued: 2000-01-23T04:56:07.000+00:00
+          invoice_number: invoice_number
+          updated: 2000-01-23T04:56:07.000+00:00
+          validation:
+            company_type: company_type
+            code: code
+            created: 2000-01-23T04:56:07.000+00:00
+            valid_format: true
+            vat_number: vat_number
+            query: query
+            active: true
+            type: au_gst
+            company_address: company_address
+            valid: true
+            country_code: country_code
+            requested: 2000-01-23T04:56:07.000+00:00
+            company_name: company_name
+            consultation_number: consultation_number
+            id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            updated: 2000-01-23T04:56:07.000+00:00
+        has_more: true
+      properties:
+        has_more:
+          description: True if this list has another page of items after this one
+            that can be fetched.
+          type: boolean
+        supplies_count:
+          format: int32
+          type: integer
+        supplies:
+          items:
+            $ref: '#/components/schemas/supply'
+          type: array
+      required:
+      - has_more
+      - supplies
+      - supplies_count
+      type: object
+    createSupply_request_vat:
+      properties:
+        inclusive:
+          description: Boolean for whether the resulting VAT amount should be calculated
+            inclusive or exclusive of VAT. Defaults to `false`. All other `vat` fields
+            will be hydrated for you.
+          type: boolean
+        rate:
+          description: "VAT rate must be either the `standard_rate` or one of the\
+            \ `reduced_rates` in the [rate object](https://vatstack.com/docs/rates)\
+            \ of `country_code`. If an invalid VAT rate is provided, it is automatically\
+            \ replaced with the `standard_rate`. The recommended way is to use the\
+            \ VAT rate determined by a previously generated [quote object](https://vatstack.com/docs/quotes)\
+            \ during checkout."
+          format: double
+          type: number
+      type: object
+    createSupply_request:
+      properties:
+        amount:
+          description: Amount in **cents** (e.g. 100.50 must be expressed as 10050).
+            This common common workaround prevents unexpected rounding issues.
+          type: integer
+        amount_refunded:
+          description: Amount in cents refunded back to the customer.
+          type: integer
+        country_code:
+          description: 2-letter ISO country code of the place of supply that is relevant
+            for the `vat.rate`.
+          type: string
+        currency:
+          description: 3-letter ISO 4217 currency code used to charge the `amount`.
+            The currency is used to correctly convert to your reporting currency.
+          type: string
+        description:
+          description: A custom string to describe the supplied item.
+          type: string
+        evidence:
+          description: "Unique identifier of an [evidence object](https://vatstack.com/docs/evidences).\
+            \ The pieces of non-contradictory evidence contained therein will affect\
+            \ the `evidence_status`."
+          format: uuid
+          type: string
+        invoice_number:
+          description: A custom string for the invoice number issued to the customer.
+            It’s advisable to follow sequential numbering.
+          type: string
+        issued:
+          description: ISO date at which the invoice was issued to the customer.
+          type: string
+        name:
+          description: A custom string for the name of the customer.
+          type: string
+        notes:
+          description: A custom string for additional notes.
+          type: string
+        validation:
+          description: "Unique identifier of a [validation object](https://vatstack.com/docs/validations).\
+            \ This is useful if you let your customer enter a VAT number beforehand.\
+            \ Its valid value can affect `vat.amount`, `vat.rate` and `amount_total`\
+            \ when zero-rating."
+          format: uuid
+          type: string
+        vat:
+          $ref: '#/components/schemas/createSupply_request_vat'
+      required:
+      - amount
+      - country_code
+      - invoice_number
+      - issued
+      type: object
+    updateSupplyById_request:
+      properties:
+        amount:
+          description: Amount in **cents** (e.g. 100.50 must be expressed as 10050).
+            This common common workaround prevents unexpected rounding issues.
+          type: integer
+        amount_refunded:
+          description: Amount in cents refunded back to the customer.
+          type: integer
+        country_code:
+          description: 2-letter ISO country code of the place of supply that is relevant
+            for the `vat.rate`.
+          type: string
+        currency:
+          description: 3-letter ISO 4217 currency code used to charge the `amount`.
+            The currency is used to correctly convert to your reporting currency.
+          type: string
+        description:
+          description: A custom string to describe the supplied item.
+          type: string
+        evidence:
+          description: "Unique identifier of an [evidence object](https://vatstack.com/docs/evidences).\
+            \ The pieces of non-contradictory evidence contained therein will affect\
+            \ the `evidence_status`."
+          format: uuid
+          type: string
+        invoice_number:
+          description: A custom string for the invoice number issued to the customer.
+            It’s advisable to follow sequential numbering.
+          type: string
+        issued:
+          description: ISO date at which the invoice was issued to the customer.
+          type: string
+        name:
+          description: A custom string for the name of the customer.
+          type: string
+        notes:
+          description: A custom string for additional notes.
+          type: string
+        validation:
+          description: "Unique identifier of a [validation object](https://vatstack.com/docs/validations).\
+            \ This is useful if you let your customer enter a VAT number beforehand.\
+            \ Its valid value can affect `vat.amount`, `vat.rate` and `amount_total`\
+            \ when zero-rating."
+          format: uuid
+          type: string
+        vat:
+          $ref: '#/components/schemas/createSupply_request_vat'
+      type: object
+    getAllValidations_200_response:
+      example:
+        has_more: true
+        validations:
+        - company_type: company_type
+          code: code
+          created: 2000-01-23T04:56:07.000+00:00
+          valid_format: true
+          vat_number: vat_number
+          query: query
+          active: true
+          type: au_gst
+          company_address: company_address
+          valid: true
+          country_code: country_code
+          requested: 2000-01-23T04:56:07.000+00:00
+          company_name: company_name
+          consultation_number: consultation_number
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          updated: 2000-01-23T04:56:07.000+00:00
+        - company_type: company_type
+          code: code
+          created: 2000-01-23T04:56:07.000+00:00
+          valid_format: true
+          vat_number: vat_number
+          query: query
+          active: true
+          type: au_gst
+          company_address: company_address
+          valid: true
+          country_code: country_code
+          requested: 2000-01-23T04:56:07.000+00:00
+          company_name: company_name
+          consultation_number: consultation_number
+          id: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          updated: 2000-01-23T04:56:07.000+00:00
+        validations_count: 0
+      properties:
+        has_more:
+          description: True if this list has another page of items after this one
+            that can be fetched.
+          type: boolean
+        validations_count:
+          format: int32
+          type: integer
+        validations:
+          items:
+            $ref: '#/components/schemas/validation'
+          type: array
+      required:
+      - has_more
+      - validations
+      - validations_count
+      type: object
+    createValidation_request:
+      properties:
+        type:
+          description: "Restrict validation to a region. If not provided, the type\
+            \ is automatically determined based on the VAT number given."
+          enum:
+          - au_gst
+          - ch_vat
+          - eu_oss_vat
+          - eu_vat
+          - gb_vat
+          - no_vat
+          - sg_gst
+          type: string
+        query:
+          description: VAT number that you want to validate.
+          type: string
+      required:
+      - query
+      type: object
+    evidence_bank_address:
+      example:
+        country_code: country_code
+        name: name
+      properties:
+        country_code:
+          description: 2-letter ISO country code of the bank or payment source.
+          maxLength: 2
+          minLength: 2
+          type: string
+        name:
+          description: Name of the bank or payment source.
+          type: string
+      type: object
+    evidence_billing_address:
+      example:
+        line_1: line_1
+        country_code: country_code
+        line_2: line_2
+        city: city
+        state: state
+        postal_code: postal_code
+      properties:
+        city:
+          description: City of the customer’s billing address.
+          type: string
+        country_code:
+          description: 2-letter ISO country code of the customer’s billing address.
+          maxLength: 2
+          minLength: 2
+          type: string
+        line_1:
+          description: Line 1 of the customer’s billing address.
+          type: string
+        line_2:
+          description: Line 2 of the customer’s billing address.
+          type: string
+        postal_code:
+          description: Postal code of the customer’s billing address.
+          type: string
+        state:
+          description: State of the customer’s billing address.
+          type: string
+      type: object
+    evidence_ip_address:
+      example:
+        country_code: country_code
+        provider: provider
+        city: city
+        label: label
+        state: state
+      properties:
+        label:
+          description: The same IP address coming from the `ip_address.label` body
+            parameter which will be geolocated automatically.
+          type: string
+        provider:
+          description: Provider used to geolocate `ip_address.label`. We use MaxMind®
+            GeoIP2 geolocation technology by default but have a number of fallback
+            providers.
+          type: string
+        city:
+          description: City of the geolocated IP address.
+          type: string
+        country_code:
+          description: 2-letter ISO country code of the geolocated IP address.
+          maxLength: 2
+          minLength: 2
+          type: string
+        state:
+          description: State of the geolocated IP address.
+          type: string
+      type: object
+    hit_supplies:
+      example:
+        used: 6
+        capacity: 0
+      properties:
+        capacity:
+          description: Included supplies in the plan you’re subscribed to.
+          format: int32
+          type: integer
+        used:
+          description: Supplies created during the running month. Additional requests
+            beyond `capacity` will be charged according to the plan you’re subscribed
+            to.
+          format: int32
+          type: integer
+      type: object
+    hit_validations:
+      example:
+        used: 5
+        capacity: 1
+      properties:
+        capacity:
+          description: Included validations in the plan you’re subscribed to.
+          format: int32
+          type: integer
+        used:
+          description: Validations created during the running month. Additional requests
+            beyond `capacity` will be charged according to the plan you’re subscribed
+            to.
+          format: int32
+          type: integer
+      type: object
+    quote_vat:
+      example:
+        rate_type: rate_type
+        inclusive: "false"
+        amount: 5
+        rate: 5.637376656633329
+        abbreviation: abbreviation
+        local_name: local_name
+      properties:
+        abbreviation:
+          description: Abbreviation of `vat.local_name`.
+          type: string
+        amount:
+          description: VAT amount in cents.
+          format: int32
+          type: integer
+        inclusive:
+          default: "false"
+          description: "Specifies if the `amount_total` is inclusive (common for EU\
+            \ consumers) or exclusive of VAT. This affects how the `vat.amount` is\
+            \ calculated. If `false`, you should present `amount` plus `vat.amount`\
+            \ to your customer as the final price to pay."
+          type: string
+        local_name:
+          description: Localized name of the VAT.
+          type: string
+        rate:
+          description: "VAT rate applied for the calculation. If member_state is `false`,\
+            \ the value will be `0`."
+          format: double
+          type: number
+        rate_type:
+          description: "Automatically determined type of VAT rate based on inputs.\
+            \ Can be `null`, `exempt`, `reduced`, `reverse_charge`, `standard` or\
+            \ `zero`."
+          type: string
+      type: object
+    rate_categories:
+      example:
+        audiobook: 6.027456183070403
+        ebook: 5.962133916683182
+        eperiodical: 5.637376656633329
+        eservice: 2.3021358869347655
+        telecommunication: 7.061401241503109
+        broadcasting: 1.4658129805029452
+      properties:
+        audiobook:
+          format: double
+          type: number
+        broadcasting:
+          format: double
+          type: number
+        ebook:
+          format: double
+          type: number
+        eperiodical:
+          format: double
+          type: number
+        eservice:
+          format: double
+          type: number
+        telecommunication:
+          format: double
+          type: number
+      type: object
+    supply_vat:
+      example:
+        rate_type: rate_type
+        inclusive: "false"
+        amount: 5
+        rate: 2.3021358869347655
+      properties:
+        amount:
+          description: VAT amount in cents.
+          format: int32
+          type: integer
+        inclusive:
+          default: "false"
+          description: Specifies if the `amount_total` is inclusive (common for EU
+            consumers) or exclusive of VAT. This affects how the `vat.amount` is calculated.
+          type: string
+        rate:
+          description: VAT rate applicable for the place of supply established in
+            `country_code`.
+          format: double
+          type: number
+        rate_type:
+          description: "Automatically determined type of VAT rate based on inputs.\
+            \ Can be `null`, `exempt`, `reduced`, `reverse_charge`, `standard` or\
+            \ `zero`."
+          type: string
+      type: object
+  securitySchemes:
+    publicKey:
+      in: header
+      name: X-API-KEY
+      type: apiKey
+    secretKey:
+      in: header
+      name: X-API-KEY
+      type: apiKey
